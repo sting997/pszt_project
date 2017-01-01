@@ -13,19 +13,24 @@ public class Population
     private int populationSize;
     private ArrayList<Integer> processDuration;
 	private int processorsNumber;
+	private double mutationRate;
 	private double surviveRate;
 	
-    public Population(int processorsNumber, int populationSize, ArrayList<Integer> data, double surviveRate) {
+    public Population(int processorsNumber, int populationSize, ArrayList<Integer> data, double mutationRate, double surviveRate) {
 		this.processorsNumber = processorsNumber;
     	this.populationSize = populationSize;
     	processDuration = new ArrayList<>(data);
         currentPopulation = new ArrayList<>();
         newPopulation = new ArrayList<>();
+        this.mutationRate = mutationRate;
         this.surviveRate = surviveRate;
         
         createRandomPopulation();
     }
-
+    
+    /**
+     * this method creates population consisting of populationSize unique individuals
+     */
     public void createRandomPopulation() {
         int count = 0;
         while (count != populationSize){
@@ -38,17 +43,25 @@ public class Population
         }
 	}
     
+    /**
+     * method used to calculate fitness of every individual and whole current population
+     * @return fitness of whole population
+     */
     public int calculateFitness() {
         this.totalFitness = 0;
         for (int i = 0; i < populationSize; i++) {
             this.totalFitness += currentPopulation.get(i).calculateFitness();
         }
         Collections.sort(currentPopulation);
-//        for (Individual i : currentPopulation)
-//    		System.out.println("fitness " + i.getFitnessValue());
+
         return this.totalFitness;
     }
 
+    /**
+     * implementation of selection based on the roulette wheel
+     * inidividuals with better fitness value are more likely to be selected
+     * @return
+     */
     Individual rouletteWheelSelection() {
         double randNum = m_rand.nextDouble() * this.totalFitness;
         int i;
@@ -62,6 +75,15 @@ public class Population
     	return currentPopulation.get(0);
     }
 
+    /**
+     * implementation of random point crossover algorithm
+     * children are a mix of parents following the rule:
+     * first part of child comes from one parent, second from another
+     * eg(rand point shown by "."): (1 2 3 . 4 5 6) + (6 5 4 . 3 2 1) -> (1 2 3 3 2 1), (6 5 4 4 5 6)  
+     * @param i1 first parent
+     * @param i2 second parent
+     * @return array of 2 children
+     */
     public Individual[] crossover(Individual i1,Individual i2) {
         Individual[] newIndiv = new Individual[2];
         newIndiv[0] = new Individual();
@@ -81,7 +103,14 @@ public class Population
         return newIndiv;
     }
 
-   
+   /**
+    * method controlling the genetic process
+    * creation of new population:
+    * 1. add surviveRate of current population to new population (save best individuals) 
+    * 2. crossover current population and add children to new population (if children are unique)
+    * 3. set new population as current population
+    * 4. mutate
+    */
     public void createNewGeneration() {
 		selectSurivingIndividuals();
 		
@@ -117,11 +146,19 @@ public class Population
 	}
 
 	void performMutation() {
-		int i = m_rand.nextInt(populationSize);
-		currentPopulation.get(i).mutate();
+		if ( m_rand.nextDouble() < mutationRate ) {
+			int i = m_rand.nextInt(populationSize);
+			currentPopulation.get(i).mutate();
+		}
 	}
     
-    
+    /**
+     * class reprezenting individual in population
+     * chromosome is represented by array of genes which represents asocciation between task and processor
+     * index of the array represents a task, value under that index represents processor which executes task
+     * @author mike
+     *
+     */
     class Individual implements Comparable<Individual>
     {
         private int[] genes = new int[processDuration.size()];
@@ -155,6 +192,7 @@ public class Population
         public void mutate() {
             Random rand = new Random();
             int index = rand.nextInt(genes.length);
+            //trick for generating new processor for a certain task 
             this.setGene(index, (getGene(index) + rand.nextInt(processorsNumber - 1) + 1) % processorsNumber);   
         }
 
@@ -163,7 +201,7 @@ public class Population
             for(int i = 0; i < genes.length; i++) {
                 schedulingTimes[getGene(i)] += processDuration.get(i);
             }
-            
+            //fitness for individual is the maximal scheduling time for one of the processors
             int max = 0;
             for (int i = 0; i < schedulingTimes.length; i++)
             	if (schedulingTimes[i] > max)
@@ -175,13 +213,14 @@ public class Population
 
 		@Override
 		public int compareTo(Individual o) {
+			//a "better" individual has shorter execution time
 			return fitnessValue > o.getFitnessValue() ? 1 : (fitnessValue < o.getFitnessValue() ? -1 : 0);
 		}
 		
 		public boolean equals(Object o) {
 		    if(!(o instanceof Individual)) 
 		        return false;
-		    
+		    //individuals are equal only when all the task assignments are the same
 		    for (int i = 0; i < genes.length; i++)
 		    	if (genes[i] != ((Individual)o).getGene(i))
 		    		return false;

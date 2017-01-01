@@ -20,50 +20,55 @@ public class SchedulingAlgorithm implements Algorithm {
 		this.surviveRate = surviveRate;
 		processDuration = new ArrayList<>();
 	}
-	
+	/**
+	 * method used to read input data for algorithm
+	 * data can be randomly generated (right now)
+	 * or read from file //TODO
+	 */
 	@Override
 	public void readData() {
-		// TODO Auto-generated method stub
 		Random random = new Random();
 		int totalTime = 0;
 		for (int i = 0; i < 2000; i++){
-			//int time = random.nextInt(10);
-			int time = 1;
+			int time = random.nextInt(10);
+			//int time = 1;
 			processDuration.add(time);
 			totalTime += time;
 		}
 		System.out.println(totalTime);
 	}
-	
+	/**
+	 * method used to initialise algorithm with random population
+	 */
 	@Override
 	public void createRandomPopulation() {
-		population = new Population(processorsNumber, populationSize, processDuration, surviveRate);
+		population = new Population(processorsNumber, populationSize, processDuration, mutationRate, surviveRate);
 	}
-
+	/**
+	 * method used to calculate fitness for every individual in population
+	 * method leaves population sorted ascending by fitness value (processing type)
+	 */
 	@Override
 	public void calculateFitness() {
 		population.calculateFitness();
 		
 	}
 
-	
-	void performCrossingOver() {
-		population.performCrossingOver();		
-	}
 
-
-	void performMutation() {
-		Random random = new Random();
-		if ( random.nextDouble() < mutationRate ) 
-			population.performMutation();      
-	}
-
+	/**
+	 * method checking if the algorithm should finish execution
+	 * right now the only criteria is number of iterations, but
+	 * can easily be changed to stop after reaching satisfactory solution
+	 */
 	@Override
 	public boolean checkTerminationCriteria() {
 		maxIterations--;
 		return maxIterations == 0;
 	}
 
+	/**
+	 * method responsible for managing crossover and mutation in population
+	 */
 	@Override
 	public void createNewGeneration() {
 		population.createNewGeneration();
@@ -71,7 +76,7 @@ public class SchedulingAlgorithm implements Algorithm {
 	
 	public static void main(String[] args) {
 		
-		Algorithm algorithm = new SchedulingAlgorithm(10, 10000, 20, 0.03, 0.4);
+		Algorithm algorithm = new SchedulingAlgorithm(10, 1000, 20, 0.03, 0.4);
 		algorithm.readData();
 		algorithm.createRandomPopulation();
 		algorithm.calculateFitness();
