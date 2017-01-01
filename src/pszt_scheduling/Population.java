@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+
 public class Population
 {
     private static Random m_rand = new Random();  // random-number generator
@@ -26,10 +27,14 @@ public class Population
     }
 
     public void createRandomPopulation() {
-        for (int i = 0; i < populationSize; i++) {
+        int count = 0;
+        while (count != populationSize){
             Individual individual = new Individual();
             individual.randomGenes();
-            currentPopulation.add(individual);
+            if (!currentPopulation.contains(individual)) {
+            	currentPopulation.add(individual);
+            	count++;
+            }
         }
 	}
     
@@ -39,8 +44,8 @@ public class Population
             this.totalFitness += currentPopulation.get(i).calculateFitness();
         }
         Collections.sort(currentPopulation);
-        for (Individual i : currentPopulation)
-    		System.out.println("fitness " + i.getFitnessValue());
+//        for (Individual i : currentPopulation)
+//    		System.out.println("fitness " + i.getFitnessValue());
         return this.totalFitness;
     }
 
@@ -83,10 +88,12 @@ public class Population
 		Individual[] children = new Individual[2];
 		while (newPopulation.size() != populationSize){
 			children = performCrossingOver();
-			newPopulation.add(children[0]);
+			if(!newPopulation.contains(children[0])) 
+					newPopulation.add(children[0]);
 			if (newPopulation.size() == populationSize)
 				break;
-			newPopulation.add(children[1]);
+			if(!newPopulation.contains(children[1])) 
+					newPopulation.add(children[1]);
 		}
 		currentPopulation = newPopulation;
 		performMutation();
@@ -100,9 +107,12 @@ public class Population
     
     Individual[] performCrossingOver() {
 		Individual[] parents = new Individual[2];
-		for (int i = 0; i < 2; i++)
-			parents[i] = rouletteWheelSelection();
-		
+		parents[0] = rouletteWheelSelection();
+		while(true){
+			parents[1] = rouletteWheelSelection();
+			if (! parents[0].equals(parents[1]))
+				break;
+		}
 		return crossover(parents[0], parents[1]);
 	}
 
@@ -151,7 +161,7 @@ public class Population
         public int calculateFitness() {
             int [] schedulingTimes = new int[processorsNumber];
             for(int i = 0; i < genes.length; i++) {
-                schedulingTimes[getGene(i)] += processDuration.get(getGene(i));
+                schedulingTimes[getGene(i)] += processDuration.get(i);
             }
             
             int max = 0;
@@ -166,6 +176,17 @@ public class Population
 		@Override
 		public int compareTo(Individual o) {
 			return fitnessValue > o.getFitnessValue() ? 1 : (fitnessValue < o.getFitnessValue() ? -1 : 0);
+		}
+		
+		public boolean equals(Object o) {
+		    if(!(o instanceof Individual)) 
+		        return false;
+		    
+		    for (int i = 0; i < genes.length; i++)
+		    	if (genes[i] != ((Individual)o).getGene(i))
+		    		return false;
+		    
+		    return true;
 		}
     }
 }

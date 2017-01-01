@@ -24,10 +24,17 @@ public class SchedulingAlgorithm implements Algorithm {
 	@Override
 	public void readData() {
 		// TODO Auto-generated method stub
-		for (int i = 0; i < 2000; i++)
-			processDuration.add(1);
+		Random random = new Random();
+		int totalTime = 0;
+		for (int i = 0; i < 2000; i++){
+			//int time = random.nextInt(10);
+			int time = 1;
+			processDuration.add(time);
+			totalTime += time;
+		}
+		System.out.println(totalTime);
 	}
-
+	
 	@Override
 	public void createRandomPopulation() {
 		population = new Population(processorsNumber, populationSize, processDuration, surviveRate);
@@ -64,7 +71,7 @@ public class SchedulingAlgorithm implements Algorithm {
 	
 	public static void main(String[] args) {
 		
-		Algorithm algorithm = new SchedulingAlgorithm(10, 1000, 5, 0.03, 0.5);
+		Algorithm algorithm = new SchedulingAlgorithm(10, 10000, 20, 0.03, 0.4);
 		algorithm.readData();
 		algorithm.createRandomPopulation();
 		algorithm.calculateFitness();
@@ -72,8 +79,9 @@ public class SchedulingAlgorithm implements Algorithm {
 		while(!algorithm.checkTerminationCriteria()){
 			algorithm.createNewGeneration();
 			algorithm.calculateFitness();
-			algorithm.printSolution(); //print solution for each generation
+			//algorithm.printSolution(); //print solution for each generation
 		}
+		algorithm.printSolution(); //print solution for each generation
 	}
 
 	@Override
