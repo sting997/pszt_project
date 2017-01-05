@@ -1,5 +1,7 @@
 package gui;
  
+import java.util.ArrayList;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -7,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -17,13 +20,20 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import pszt_scheduling.Algorithm;
+import pszt_scheduling.SchedulingAlgorithm;
+import pszt_scheduling.Solution;
  
 public class PsztApplication extends Application {	
-	private TextField processorsTextField = new TextField();
-	private TextField populationTextField = new TextField();
-	private TextField mutationTextField = new TextField();
-	private TextField surviveTextField = new TextField();
-	
+	private TextField processorsTextField = new TextField("10");
+	private TextField populationTextField = new TextField("20");
+	private TextField mutationTextField = new TextField("0.03");
+	private TextField surviveTextField = new TextField("0.4");
+	private TextField iterationsTextField = new TextField("1000");
+
+	final NumberAxis xAxis = new NumberAxis();
+    final NumberAxis yAxis = new NumberAxis();
+    LineChart<Number,Number> lineChart = new LineChart<Number,Number>(xAxis,yAxis);
 	
 	private void init(Stage stage) {
 		Text scenetitle = new Text("Scheduling processes algorithm");
@@ -63,27 +73,44 @@ public class PsztApplication extends Application {
     	
     	Label surviveLabel = new Label("Survive:");
     	grid.add(surviveLabel, 0, 4);
-
+    	
     	
     	surviveTextField.setPromptText("Enter survive rate");
     	grid.add(surviveTextField, 1, 4);
     	
+    	Label iterationsLabel = new Label("Iterations:");
+    	grid.add(iterationsLabel, 0, 5);
+    	
+    	
+    	iterationsTextField.setPromptText("Enter iterations number");
+    	grid.add(iterationsTextField, 1, 5);
+    	
     	Button button = new Button("Start");
         button.setOnAction((ActionEvent e) -> {
-         	//TODO
+        	XYChart.Series series = new XYChart.Series();
+        	int processors = Integer.parseInt(processorsTextField.getText());
+        	int iterations = Integer.parseInt(iterationsTextField.getText());
+        	int population = Integer.parseInt(populationTextField.getText());
+        	double mutation = Double.parseDouble(mutationTextField.getText());
+        	double survive = Double.parseDouble(surviveTextField.getText());
+    		Algorithm algorithm = new SchedulingAlgorithm(processors, iterations, population, mutation, survive);
+    		Solution solution = algorithm.calculateSolution();
+    		ArrayList<Integer> data = solution.getSolutionHistory();
+            for (int i = 0; i < data.size(); i++)
+            	series.getData().add(new XYChart.Data(i, data.get(i)));
+            lineChart.getData().add(series);
         });
         
         HBox buttonHbox = new HBox();
         buttonHbox.setAlignment(Pos.BASELINE_CENTER);
         buttonHbox.getChildren().add(button);
         
-        grid.add(buttonHbox, 0, 5, 2, 1);
+        grid.add(buttonHbox, 0, 6, 2, 1);
     	
-    	final NumberAxis xAxis = new NumberAxis();
-        final NumberAxis yAxis = new NumberAxis();
+    	
         xAxis.setLabel("Iteration");
         yAxis.setLabel("Fitness");
-        LineChart<Number,Number> lineChart = new LineChart<Number,Number>(xAxis,yAxis);
+        
 
         
        
@@ -109,6 +136,7 @@ public class PsztApplication extends Application {
     	
   
     	init(stage);
+    	
     	
 
 }

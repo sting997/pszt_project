@@ -11,6 +11,7 @@ public class SchedulingAlgorithm implements Algorithm {
 	private double surviveRate;
 	private Population population;
 	private ArrayList<Integer> processDuration;
+	private ArrayList<Integer> solutionHistory;
 	
 	public SchedulingAlgorithm(int processorsNumber,int maxIterations, int populationSize, double mutationRate, double surviveRate) {
 		this.processorsNumber = processorsNumber;
@@ -19,19 +20,19 @@ public class SchedulingAlgorithm implements Algorithm {
 		this.mutationRate = mutationRate;
 		this.surviveRate = surviveRate;
 		processDuration = new ArrayList<>();
+		solutionHistory = new ArrayList<>();
 	}
 	/**
 	 * method used to read input data for algorithm
 	 * data can be randomly generated (right now)
 	 * or read from file //TODO
 	 */
-	@Override
 	public void readData() {
 		Random random = new Random();
 		int totalTime = 0;
-		for (int i = 0; i < 2000; i++){
-			int time = random.nextInt(10);
-			//int time = 1;
+		for (int i = 0; i < 200; i++){
+			//int time = random.nextInt(10);
+			int time = 1;
 			processDuration.add(time);
 			totalTime += time;
 		}
@@ -40,7 +41,6 @@ public class SchedulingAlgorithm implements Algorithm {
 	/**
 	 * method used to initialise algorithm with random population
 	 */
-	@Override
 	public void createRandomPopulation() {
 		population = new Population(processorsNumber, populationSize, processDuration, mutationRate, surviveRate);
 	}
@@ -48,7 +48,6 @@ public class SchedulingAlgorithm implements Algorithm {
 	 * method used to calculate fitness for every individual in population
 	 * method leaves population sorted ascending by fitness value (processing type)
 	 */
-	@Override
 	public void calculateFitness() {
 		population.calculateFitness();
 		
@@ -60,7 +59,6 @@ public class SchedulingAlgorithm implements Algorithm {
 	 * right now the only criteria is number of iterations, but
 	 * can easily be changed to stop after reaching satisfactory solution
 	 */
-	@Override
 	public boolean checkTerminationCriteria() {
 		maxIterations--;
 		return maxIterations == 0;
@@ -69,18 +67,18 @@ public class SchedulingAlgorithm implements Algorithm {
 	/**
 	 * method responsible for managing crossover and mutation in population
 	 */
-	@Override
 	public void createNewGeneration() {
 		population.createNewGeneration();
 	}
 	
 	public static void main(String[] args) {
 		
-		Algorithm algorithm = new SchedulingAlgorithm(10, 1000, 20, 0.03, 0.4);
+		SchedulingAlgorithm algorithm = new SchedulingAlgorithm(10, 1000, 20, 0.03, 0.4);
 		algorithm.readData();
 		algorithm.createRandomPopulation();
 		algorithm.calculateFitness();
 		algorithm.printSolution(); //print solution generated randomly
+		
 		while(!algorithm.checkTerminationCriteria()){
 			algorithm.createNewGeneration();
 			algorithm.calculateFitness();
@@ -89,9 +87,22 @@ public class SchedulingAlgorithm implements Algorithm {
 		algorithm.printSolution(); //print solution for each generation
 	}
 
-	@Override
+	
 	public void printSolution() {
 		System.out.println("solution: " + population.findBestIndividual().getFitnessValue());
+	}
+	
+	public Solution calculateSolution() {
+		readData();
+		createRandomPopulation();
+		calculateFitness();
+		solutionHistory.add(population.findBestIndividual().getFitnessValue());
+		while (!checkTerminationCriteria()){
+			createNewGeneration();
+			calculateFitness();
+			solutionHistory.add(population.findBestIndividual().getFitnessValue());
+		}
+		return new Solution(population.findBestIndividual().getFitnessValue(), solutionHistory);
 	}
 
 }
