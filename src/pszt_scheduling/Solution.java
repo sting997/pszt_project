@@ -18,4 +18,6 @@ public class Solution {
 	public ArrayList<Integer> getSolutionHistory() {
 		return solutionHistory;
 	}
+	
+	//TODO method which returns decoded solution (phenotype)
 }

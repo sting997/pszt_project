@@ -13,6 +13,8 @@ public class SchedulingAlgorithm implements Algorithm {
 	private ArrayList<Integer> processDuration;
 	private ArrayList<Integer> solutionHistory;
 	
+	//TODO change methods modifier from public to private (except calculateSolution)
+	
 	public SchedulingAlgorithm(int processorsNumber,int maxIterations, int populationSize, double mutationRate, double surviveRate) {
 		this.processorsNumber = processorsNumber;
 		this.maxIterations = maxIterations + 1; //we check iterations amount before calculating anything
@@ -61,6 +63,8 @@ public class SchedulingAlgorithm implements Algorithm {
 	 */
 	public boolean checkTerminationCriteria() {
 		maxIterations--;
+		//TODO add termination criteria based on satisfaction of solution: eg. terminate
+		//when solution is smaller than 1,1 * minimal possible (sum_of_tasks_durations / nr_processors) 
 		return maxIterations == 0;
 	}
 

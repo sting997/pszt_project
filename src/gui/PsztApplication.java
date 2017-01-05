@@ -86,19 +86,27 @@ public class PsztApplication extends Application {
     	grid.add(iterationsTextField, 1, 5);
     	
     	Button button = new Button("Start");
-        button.setOnAction((ActionEvent e) -> {
+        button.setOnAction((ActionEvent event) -> {
         	XYChart.Series series = new XYChart.Series();
-        	int processors = Integer.parseInt(processorsTextField.getText());
-        	int iterations = Integer.parseInt(iterationsTextField.getText());
-        	int population = Integer.parseInt(populationTextField.getText());
-        	double mutation = Double.parseDouble(mutationTextField.getText());
-        	double survive = Double.parseDouble(surviveTextField.getText());
+        	int processors = 0, iterations = 0, population = 0;
+        	double mutation = 0, survive = 0;
+        	try{
+	        	processors = Integer.parseInt(processorsTextField.getText());
+	        	iterations = Integer.parseInt(iterationsTextField.getText());
+	        	population = Integer.parseInt(populationTextField.getText());
+	        	System.out.println("lipa");
+	        	mutation = Double.parseDouble(mutationTextField.getText());
+	        	survive = Double.parseDouble(surviveTextField.getText());
+        	}catch (Exception e) {
+				//TODO NumberFormatException, NullPointerException to handle
+			}
     		Algorithm algorithm = new SchedulingAlgorithm(processors, iterations, population, mutation, survive);
     		Solution solution = algorithm.calculateSolution();
     		ArrayList<Integer> data = solution.getSolutionHistory();
             for (int i = 0; i < data.size(); i++)
             	series.getData().add(new XYChart.Data(i, data.get(i)));
             lineChart.getData().add(series);
+            //TODO print some info about solution, maybe draw gannt chart showing scheduling?
         });
         
         HBox buttonHbox = new HBox();

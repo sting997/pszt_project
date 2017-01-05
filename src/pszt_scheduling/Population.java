@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class Population
 {
-    private static Random m_rand = new Random();  // random-number generator
+    private static Random m_rand = new Random();
     private ArrayList<Individual> currentPopulation;
     private ArrayList<Individual> newPopulation;
     private int totalFitness;
