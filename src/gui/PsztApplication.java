@@ -21,28 +21,23 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
  
-public class PsztApplication extends Application {
-	private GridPane grid = new GridPane();
-
-	
+public class PsztApplication extends Application {	
 	
 	private void init(Stage stage) {
+		Text scenetitle = new Text("Scheduling processes algorithm");
+    	scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+    	HBox hboxTop = new HBox();
+        hboxTop.setPadding(new Insets(15, 12, 15, 12));
+        hboxTop.setSpacing(10);
+        hboxTop.setAlignment(Pos.BASELINE_CENTER);
+        hboxTop.getChildren().add(scenetitle);
+		
+		GridPane grid = new GridPane();
     	grid.setAlignment(Pos.CENTER);
     	grid.setHgap(10);
     	grid.setVgap(10);
     	grid.setPadding(new Insets(25, 25, 25, 25));
-	}
-	
-	
-    @Override
-    public void start(Stage stage) {
     	
-  
-    	init(stage);
-    	Text scenetitle = new Text("Scheduling processes algorithm");
-    	scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-    	//rid.add(scenetitle, 0, 0, 2, 1);
-
     	Label processorsLabel = new Label("Processors:");
     	grid.add(processorsLabel, 0, 1);
 
@@ -54,7 +49,7 @@ public class PsztApplication extends Application {
     	grid.add(populationLabel, 0, 2);
 
     	TextField populationTextField = new TextField();
-    	populationTextField.setPromptText("Enter processors number");
+    	populationTextField.setPromptText("Enter population size");
     	grid.add(populationTextField, 1, 2);
     	
     	Label mutationLabel = new Label("Mutation:");
@@ -75,16 +70,9 @@ public class PsztApplication extends Application {
         final NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Iteration");
         yAxis.setLabel("Fitness");
-        //creating the chart
         LineChart<Number,Number> lineChart = new LineChart<Number,Number>(xAxis,yAxis);
-    	
-    	
+
         
-        HBox hboxTop = new HBox();
-        hboxTop.setPadding(new Insets(15, 12, 15, 12));
-        hboxTop.setSpacing(10);
-        hboxTop.setAlignment(Pos.BASELINE_CENTER);
-        hboxTop.getChildren().add(scenetitle);
     	BorderPane border = new BorderPane();
     	border.setTop(hboxTop);
     	border.setLeft(grid);
@@ -95,8 +83,17 @@ public class PsztApplication extends Application {
     	stage.setScene(scene);
     	
     	
-    	stage.setTitle("JavaFX Welcome");
+    	stage.setTitle("PsztApplication");
         stage.show();
+	}
+	
+	
+    @Override
+    public void start(Stage stage) {
+    	
+  
+    	init(stage);
+    	
 
 }
 
