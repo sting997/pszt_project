@@ -111,7 +111,7 @@ public class SchedulingAlgorithm implements Algorithm {
 	}
 	
 	public Solution calculateSolution() {
-		ArrayList<Integer> taskList = new ArrayList<Integer>(Arrays.asList(1,2,3,5,6,7,8,9,10));
+		//ArrayList<Integer> taskList = new ArrayList<Integer>(Arrays.asList(1,2,3,5,6,7,8,9,10));
 		//readData();
 		createRandomPopulation();
 		calculateFitness();
@@ -124,4 +124,9 @@ public class SchedulingAlgorithm implements Algorithm {
 		return new Solution(population.findBestIndividual().getFitnessValue(), solutionHistory);
 	}
 
+	@Override
+	public void getData(ArrayList<Integer> list) {
+		//ArrayList<Integer> taskList = new ArrayList<Integer>(Arrays.asList(1,2,3,5,6,7,8,9,10,1,3,8,4,5,6,4,7,2,3,2,3,4,1,8));
+		readData(list);
+	}
 }
