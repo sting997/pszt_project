@@ -16,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -30,11 +31,13 @@ public class PsztApplication extends Application {
 	private TextField mutationTextField = new TextField("0.03");
 	private TextField surviveTextField = new TextField("0.4");
 	private TextField iterationsTextField = new TextField("1000");
-
-	final NumberAxis xAxis = new NumberAxis();
-    final NumberAxis yAxis = new NumberAxis();
-    LineChart<Number,Number> lineChart = new LineChart<Number,Number>(xAxis,yAxis);
-	
+	private Text infoText = new Text();
+	private Text solutionText = new Text();
+	private Button button = new Button("Start");
+	private NumberAxis xAxis = new NumberAxis();
+    private NumberAxis yAxis = new NumberAxis();
+    private LineChart<Number,Number> lineChart = new LineChart<Number,Number>(xAxis,yAxis);
+	    
 	private void init(Stage stage) {
 		Text scenetitle = new Text("Scheduling processes algorithm");
     	scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -53,7 +56,6 @@ public class PsztApplication extends Application {
     	Label processorsLabel = new Label("Processors:");
     	grid.add(processorsLabel, 0, 1);
 
-    	
     	processorsTextField.setPromptText("Enter processors number");
     	grid.add(processorsTextField, 1, 1);
 
@@ -67,7 +69,6 @@ public class PsztApplication extends Application {
     	Label mutationLabel = new Label("Mutation:");
     	grid.add(mutationLabel, 0, 3);
 
-    	
     	mutationTextField.setPromptText("Enter mutation rate");
     	grid.add(mutationTextField, 1, 3);
     	
@@ -81,72 +82,76 @@ public class PsztApplication extends Application {
     	Label iterationsLabel = new Label("Iterations:");
     	grid.add(iterationsLabel, 0, 5);
     	
-    	
     	iterationsTextField.setPromptText("Enter iterations number");
     	grid.add(iterationsTextField, 1, 5);
     	
-    	Button button = new Button("Start");
-        button.setOnAction((ActionEvent event) -> {
-        	XYChart.Series series = new XYChart.Series();
-        	int processors = 0, iterations = 0, population = 0;
-        	double mutation = 0, survive = 0;
-        	try{
-	        	processors = Integer.parseInt(processorsTextField.getText());
-	        	iterations = Integer.parseInt(iterationsTextField.getText());
-	        	population = Integer.parseInt(populationTextField.getText());
-	        	System.out.println("lipa");
-	        	mutation = Double.parseDouble(mutationTextField.getText());
-	        	survive = Double.parseDouble(surviveTextField.getText());
-        	}catch (Exception e) {
-				//TODO NumberFormatException, NullPointerException to handle
-			}
-    		Algorithm algorithm = new SchedulingAlgorithm(processors, iterations, population, mutation, survive);
-    		Solution solution = algorithm.calculateSolution();
-    		ArrayList<Integer> data = solution.getSolutionHistory();
-            for (int i = 0; i < data.size(); i++)
-            	series.getData().add(new XYChart.Data(i, data.get(i)));
-            lineChart.getData().add(series);
-            //TODO print some info about solution, maybe draw gannt chart showing scheduling?
-        });
+    	HBox textHbox = new HBox();
+        textHbox.setAlignment(Pos.BASELINE_CENTER);
+        textHbox.getChildren().add(infoText);
+        
+        grid.add(textHbox, 0, 7, 2, 1);
+    	
+        HBox solutionHbox = new HBox();
+        solutionHbox.setAlignment(Pos.BASELINE_CENTER);
+        solutionHbox.getChildren().add(solutionText);
+        grid.add(solutionHbox, 0, 8, 2, 1);
         
         HBox buttonHbox = new HBox();
         buttonHbox.setAlignment(Pos.BASELINE_CENTER);
         buttonHbox.getChildren().add(button);
         
         grid.add(buttonHbox, 0, 6, 2, 1);
-    	
+        
+        button.setOnAction((ActionEvent event) -> {
+        	handleButton();
+        });
     	
         xAxis.setLabel("Iteration");
         yAxis.setLabel("Fitness");
-        
-
-        
-       
-        
         
     	BorderPane border = new BorderPane();
     	border.setTop(hboxTop);
     	border.setLeft(grid);
     	border.setCenter(lineChart);
+    	
     	Scene scene = new Scene(border);
-    	
-    	
+   
     	stage.setScene(scene);
-    	
-    	
     	stage.setTitle("PsztApplication");
         stage.show();
 	}
 	
+	private void handleButton() {
+		XYChart.Series series = new XYChart.Series();
+    	int processors = 0, iterations = 0, population = 0;
+    	double mutation = 0, survive = 0;
+    	
+    	solutionText.setText("");
+    	infoText.setText("");
+    	try{
+        	processors = Integer.parseInt(processorsTextField.getText());
+        	iterations = Integer.parseInt(iterationsTextField.getText());
+        	population = Integer.parseInt(populationTextField.getText());
+        	mutation = Double.parseDouble(mutationTextField.getText());
+        	survive = Double.parseDouble(surviveTextField.getText());
+        	
+        	Algorithm algorithm = new SchedulingAlgorithm(processors, iterations, population, mutation, survive);
+    		Solution solution = algorithm.calculateSolution();
+    		ArrayList<Integer> data = solution.getSolutionHistory();
+            for (int i = 0; i < data.size(); i++)
+            	series.getData().add(new XYChart.Data(i, data.get(i)));
+            lineChart.getData().add(series);
+            
+            solutionText.setText("Solution: " + solution.getSolution());
+    	}catch (NumberFormatException e) {
+    		infoText.setFill(Color.FIREBRICK);
+    		infoText.setText("Invalid number format");
+		}
+	}
 	
     @Override
     public void start(Stage stage) {
-    	
-  
     	init(stage);
-    	
-    	
-
 }
 
     public static void main(String[] args) {

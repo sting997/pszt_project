@@ -19,5 +19,4 @@ public class Solution {
 		return solutionHistory;
 	}
 	
-	//TODO method which returns decoded solution (phenotype)
 }
