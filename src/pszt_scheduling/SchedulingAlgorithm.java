@@ -1,6 +1,8 @@
 package pszt_scheduling;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class SchedulingAlgorithm implements Algorithm {
@@ -33,13 +35,22 @@ public class SchedulingAlgorithm implements Algorithm {
 		Random random = new Random();
 		int totalTime = 0;
 		for (int i = 0; i < 200; i++){
-			//int time = random.nextInt(10);
-			int time = 1;
+			int time = random.nextInt(10);
+			///int time = 1;
 			processDuration.add(time);
 			totalTime += time;
 		}
-		System.out.println(totalTime);
+		//System.out.println(totalTime);
 	}
+	public void readData(ArrayList<Integer> durationOfTaskList){
+		processDuration.addAll(durationOfTaskList);
+		int totalTime = 0;
+		for (int i: processDuration)
+			totalTime += i;
+		System.out.println("Całkowity czas wykonania " + processDuration.size() + " zadan wynosi: " + totalTime);
+		System.out.println(processDuration);
+	}
+
 	/**
 	 * method used to initialise algorithm with random population
 	 */
@@ -78,7 +89,10 @@ public class SchedulingAlgorithm implements Algorithm {
 	public static void main(String[] args) {
 		
 		SchedulingAlgorithm algorithm = new SchedulingAlgorithm(10, 1000, 20, 0.03, 0.4);
-		algorithm.readData();
+
+		ArrayList<Integer> taskList = new ArrayList<Integer>(Arrays.asList(1,2,3,5,6,7,8,9,10));
+		//algorithm.readData();
+		algorithm.readData(taskList);
 		algorithm.createRandomPopulation();
 		algorithm.calculateFitness();
 		algorithm.printSolution(); //print solution generated randomly
@@ -97,7 +111,8 @@ public class SchedulingAlgorithm implements Algorithm {
 	}
 	
 	public Solution calculateSolution() {
-		readData();
+		ArrayList<Integer> taskList = new ArrayList<Integer>(Arrays.asList(1,2,3,5,6,7,8,9,10));
+		//readData();
 		createRandomPopulation();
 		calculateFitness();
 		solutionHistory.add(population.findBestIndividual().getFitnessValue());
