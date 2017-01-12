@@ -108,6 +108,7 @@ public class PsztApplication extends Application {
     	
         xAxis.setLabel("Iteration");
         yAxis.setLabel("Fitness");
+        lineChart.setLegendVisible(false);
         
     	BorderPane border = new BorderPane();
     	border.setTop(hboxTop);
