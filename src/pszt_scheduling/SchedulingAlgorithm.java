@@ -15,7 +15,6 @@ public class SchedulingAlgorithm implements Algorithm {
 	private ArrayList<Integer> processDuration;
 	private ArrayList<Integer> solutionHistory;
 	
-	//TODO change methods modifier from public to private (except calculateSolution)
 	
 	public SchedulingAlgorithm(int processorsNumber,int maxIterations, int populationSize, double mutationRate, double surviveRate) {
 		this.processorsNumber = processorsNumber;
@@ -35,20 +34,19 @@ public class SchedulingAlgorithm implements Algorithm {
 		Random random = new Random();
 		int totalTime = 0;
 		for (int i = 0; i < 200; i++){
-			int time = random.nextInt(10);
-			///int time = 1;
+			//int time = random.nextInt(10);
+			int time = 1;
 			processDuration.add(time);
 			totalTime += time;
 		}
-		//System.out.println(totalTime);
+		System.out.println(totalTime);
 	}
 	public void readData(ArrayList<Integer> durationOfTaskList){
 		processDuration.addAll(durationOfTaskList);
 		int totalTime = 0;
 		for (int i: processDuration)
 			totalTime += i;
-		System.out.println("Całkowity czas wykonania " + processDuration.size() + " zadan wynosi: " + totalTime);
-		System.out.println(processDuration);
+		System.out.println(totalTime);
 	}
 
 	/**
@@ -86,33 +84,12 @@ public class SchedulingAlgorithm implements Algorithm {
 		population.createNewGeneration();
 	}
 	
-	public static void main(String[] args) {
-		
-		SchedulingAlgorithm algorithm = new SchedulingAlgorithm(10, 1000, 20, 0.03, 0.4);
-
-		ArrayList<Integer> taskList = new ArrayList<Integer>(Arrays.asList(1,2,3,5,6,7,8,9,10));
-		//algorithm.readData();
-		algorithm.readData(taskList);
-		algorithm.createRandomPopulation();
-		algorithm.calculateFitness();
-		algorithm.printSolution(); //print solution generated randomly
-		
-		while(!algorithm.checkTerminationCriteria()){
-			algorithm.createNewGeneration();
-			algorithm.calculateFitness();
-			//algorithm.printSolution(); //print solution for each generation
-		}
-		algorithm.printSolution(); //print solution for each generation
-	}
-
 	
 	public void printSolution() {
 		System.out.println("solution: " + population.findBestIndividual().getFitnessValue());
 	}
 	
 	public Solution calculateSolution() {
-		ArrayList<Integer> taskList = new ArrayList<Integer>(Arrays.asList(1,2,3,5,6,7,8,9,10));
-		//readData();
 		createRandomPopulation();
 		calculateFitness();
 		solutionHistory.add(population.findBestIndividual().getFitnessValue());
@@ -123,5 +100,6 @@ public class SchedulingAlgorithm implements Algorithm {
 		}
 		return new Solution(population.findBestIndividual().getFitnessValue(), solutionHistory);
 	}
+	
 
 }

@@ -1,6 +1,9 @@
 package gui;
  
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -31,6 +34,7 @@ public class PsztApplication extends Application {
 	private TextField mutationTextField = new TextField("0.03");
 	private TextField surviveTextField = new TextField("0.4");
 	private TextField iterationsTextField = new TextField("1000");
+	private TextField fileTextField = new TextField();
 	private Text infoText = new Text();
 	private Text solutionText = new Text();
 	private Button button = new Button("Start");
@@ -85,22 +89,28 @@ public class PsztApplication extends Application {
     	iterationsTextField.setPromptText("Enter iterations number");
     	grid.add(iterationsTextField, 1, 5);
     	
+    	Label fileLabel = new Label("Data file:");
+    	grid.add(fileLabel, 0, 6);
+    	
+    	fileTextField.setPromptText("Enter filename");
+    	grid.add(fileTextField, 1, 6);
+    	
     	HBox textHbox = new HBox();
         textHbox.setAlignment(Pos.BASELINE_CENTER);
         textHbox.getChildren().add(infoText);
         
-        grid.add(textHbox, 0, 7, 2, 1);
+        grid.add(textHbox, 0, 8, 2, 1);
     	
         HBox solutionHbox = new HBox();
         solutionHbox.setAlignment(Pos.BASELINE_CENTER);
         solutionHbox.getChildren().add(solutionText);
-        grid.add(solutionHbox, 0, 8, 2, 1);
+        grid.add(solutionHbox, 0, 9, 2, 1);
         
         HBox buttonHbox = new HBox();
         buttonHbox.setAlignment(Pos.BASELINE_CENTER);
         buttonHbox.getChildren().add(button);
         
-        grid.add(buttonHbox, 0, 6, 2, 1);
+        grid.add(buttonHbox, 0, 7, 2, 1);
         
         button.setOnAction((ActionEvent event) -> {
         	handleButton();
@@ -126,7 +136,7 @@ public class PsztApplication extends Application {
 		XYChart.Series series = new XYChart.Series();
     	int processors = 0, iterations = 0, population = 0;
     	double mutation = 0, survive = 0;
-    	
+    	String filename = new String();
     	solutionText.setText("");
     	infoText.setText("");
     	try{
@@ -135,9 +145,12 @@ public class PsztApplication extends Application {
         	population = Integer.parseInt(populationTextField.getText());
         	mutation = Double.parseDouble(mutationTextField.getText());
         	survive = Double.parseDouble(surviveTextField.getText());
-        	
+        	filename = fileTextField.getText();
+        	ArrayList<Integer> taskDuration = new ArrayList<>();
+        	taskDuration = readFromFile(filename);
         	Algorithm algorithm = new SchedulingAlgorithm(processors, iterations, population, mutation, survive);
-    		Solution solution = algorithm.calculateSolution();
+    		algorithm.readData(taskDuration);
+        	Solution solution = algorithm.calculateSolution();
     		ArrayList<Integer> data = solution.getSolutionHistory();
             for (int i = 0; i < data.size(); i++)
             	series.getData().add(new XYChart.Data(i, data.get(i)));
@@ -147,6 +160,33 @@ public class PsztApplication extends Application {
     	}catch (NumberFormatException e) {
     		infoText.setFill(Color.FIREBRICK);
     		infoText.setText("Invalid number format");
+		} catch (FileNotFoundException e) {
+			infoText.setFill(Color.FIREBRICK);
+    		infoText.setText("File not found. Data generated in programme code");
+			Algorithm algorithm = new SchedulingAlgorithm(processors, iterations, population, mutation, survive);
+    		algorithm.readData();
+        	Solution solution = algorithm.calculateSolution();
+    		ArrayList<Integer> data = solution.getSolutionHistory();
+            for (int i = 0; i < data.size(); i++)
+            	series.getData().add(new XYChart.Data(i, data.get(i)));
+            lineChart.getData().add(series);
+            
+            solutionText.setText("Solution: " + solution.getSolution());
+		}
+	}
+	
+	private ArrayList<Integer> readFromFile(String filename) throws FileNotFoundException{
+		Scanner scanner = null;
+		try{
+			scanner = new Scanner(new File(filename));
+	    	ArrayList<Integer> data = new ArrayList<>();
+	    	while(scanner.hasNextInt()){
+	    		data.add(scanner.nextInt());
+	    	}
+	    	return data;
+		}finally {
+			if(scanner != null)
+				scanner.close();
 		}
 	}
 	
